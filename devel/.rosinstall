@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/iglesias/ros_workspaces/ros_bruno_robot/devel/setup.sh

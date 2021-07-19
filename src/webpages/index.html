@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link href="css/main.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css"
+    href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>
+  <script src="js/display.js"></script>
+  <script type="text/javascript"
+    src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+  <script type="text/javascript"
+    src="https://static.robotwebtools.org/keyboardteleopjs/current/keyboardteleop.min.js"></script>
+  <script src="js/easeljs.js"></script>
+  <script src="js/ros2d.js"></script>
+  <link href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+  <script>
+
+    const ros = new ROSLIB.Ros();
+
+    const cmdVel = new ROSLIB.Topic({
+        ros: ros,
+        name: '/cmd_vel',
+        messageType: 'geometry_msgs/Twist'
+      })
+
+    function init(){
+
+      ros.on('connection', function() {
+        displaySuccess('Roslibjs connected to rosbridge.');
+      });
+
+      ros.on('error', function(error){
+        console.log('Error connecting to websocket server: ', error);
+      });
+
+      ros.connect('ws://0.0.0.0:9090');
+
+      var viewer2D = new ROS2D.Viewer({
+        divID : 'twod-map',
+        width : 600,
+        height : 600
+      });
+
+      
+      var gridClient = new ROS2D.OccupancyGridClient({
+        ros : ros,
+        rootObject : viewer2D.scene,
+        continuous: true
+      });
+
+
+      gridClient.on('change', function() {  
+        try {
+          viewer2D.scaleToDimensions(gridClient.currentGrid.width, gridClient.currentGrid.height);
+          viewer2D.shift(gridClient.currentGrid.pose.position.x, gridClient.currentGrid.pose.position.y);    
+          
+          displayPoseMarker()
+        } catch (error) {
+          console.log('erro')
+        }
+      });
+
+      function displayPoseMarker() {
+        // Create a marker representing the robot.
+        var robotMarker = new ROS2D.NavigationArrow({
+          size : 12,
+          strokeSize : 1,
+          fillColor : createjs.Graphics.getRGB(255, 128, 0, 0.66),
+        });
+        robotMarker.visible = false;
+
+        // Add the marker to the 2D scene.
+        gridClient.rootObject.addChild(robotMarker);
+        var initScaleSet = false;
+
+        // Subscribe to the robot's pose updates.
+        var poseListener = new ROSLIB.Topic({
+          ros : ros,
+          name : '/odom',
+          messageType : 'nav_msgs/Odometry',
+        });
+      
+        poseListener.subscribe(function(pose) {
+          // Orientate the marker based on the robot's pose.
+          robotMarker.x = pose.pose.pose.position.x;
+          robotMarker.y = -pose.pose.pose.position.y;
+          if (!initScaleSet) {
+            robotMarker.scaleX = 1.0 / viewer2D.scene.scaleX;
+            robotMarker.scaleY = 1.0 / viewer2D.scene.scaleY;
+            initScaleSet = true;
+          }
+          robotMarker.rotation = viewer2D.scene.rosQuaternionToGlobalTheta(pose.pose.pose.orientation);
+          robotMarker.visible = true;
+     
+        });
+      }
+    
+
+    }
+
+    function clearmove(){
+        var twist = new ROSLIB.Message({
+        linear:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        },
+        angular:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        }
+      });
+      cmdVel.publish(twist)
+    }
+
+    function moveup(){
+      var twist = new ROSLIB.Message({
+        linear:{
+          x: 0.5,
+          y: 0.0,
+          z: 0.0
+        },
+        angular:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        }
+      });
+      cmdVel.publish(twist)
+    }
+
+    function moveleft(){
+      var twist = new ROSLIB.Message({
+        linear:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        },
+        angular:{
+          x: 0.0,
+          y: 0.0,
+          z: -0.5
+        }
+      });
+      cmdVel.publish(twist)
+    }
+
+    function moveright(){
+      var twist = new ROSLIB.Message({
+        linear:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        },
+        angular:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.5
+        }
+      });
+      cmdVel.publish(twist)
+    }
+
+    function moverdown(){
+      var twist = new ROSLIB.Message({
+        linear:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        },
+        angular:{
+          x: 0.0,
+          y: 0.0,
+          z: 0.0
+        }
+      });
+      cmdVel.publish(twist)
+    }
+
+  </script>
+
+</head>
+<body onload="init()">
+  <div class="container">
+    <div id="messages">
+      <div class="alert">
+        Waiting to connect to rosbridge.
+      </div>
+    </div>
+    <div class="d-flex row ">
+      <div class="row">
+        <div id="twod-map"></div>
+        <div style="display: flex; justify-content: center; align-items: center; width: 550px">
+          <div style="text-align:center;width:480px;">
+            <button class="btn btn-light p-5 border" onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()" touchcancel="clearmove()">UP</button><br><br>
+            <button class="btn btn-light p-5 mr-4 border" onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()" touchcancel="clearmove()">LEFT</button>
+            <button class="btn btn-light p-5 ml-4 border" onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()" touchcancel="clearmove()">RIGHT</button><br><br>
+            <button class="btn btn-light p-5 border" onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()" touchcancel="clearmove()">DOWN</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

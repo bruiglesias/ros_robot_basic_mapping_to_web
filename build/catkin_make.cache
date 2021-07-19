@@ -1,0 +1,2 @@
+my_simulations:robot_description
+-DCATKIN_DEVEL_PREFIX=/home/iglesias/ros_workspaces/ros_bruno_robot/devel -DCMAKE_INSTALL_PREFIX=/home/iglesias/ros_workspaces/ros_bruno_robot/install -G Unix Makefiles
