@@ -1,6 +1,6 @@
 # Exemplo 
 
-<img src="https://github.com/bruiglesias/ros_robot_basic_mapping_to_web/blob/master/src/webpages/images/image01.png" width="600"/> 
+<img src="https://github.com/bruiglesias/ros_robot_basic_mapping_to_web/blob/master/src/webpages/images/image01.png" width="1200"/> 
 
 # Iniciando o mundo, modelo e rviz ( if want just clone and run)
 
