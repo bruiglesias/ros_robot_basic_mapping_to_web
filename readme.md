@@ -1,4 +1,19 @@
-# criando o projeto 
+# Iniciando o mundo, modelo e rviz ( if want just clone and run)
+
+roslaunch my_simulations my_world.launch --screen
+
+roslaunch robot_description spawn.launch
+
+roslaunch robot_description rviz.launch
+
+roslaunch rosbridge_server rosbridge_websocket.launch
+
+roslaunch robot_description hector_mapping.launch
+
+open webpage folder index file 
+
+
+# Criando o projeto  (if want re-create step-by-step)
 
 cd ros_workspaces
 
@@ -60,12 +75,15 @@ catkin_make
 
 No arquivo, substituir a linha parecida por:
 
+```
 <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find robot_description)/urdf/robot.xacro'" />
 
+```
 e também por:
 
+```
 <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
-
+```
 
 # iniciando o mundo, modelo e rviz
 
