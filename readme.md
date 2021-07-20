@@ -101,4 +101,11 @@ roslaunch rosbridge_server rosbridge_websocket.launch
 
 roslaunch robot_description hector_mapping.launch
 
+roslaunch robot_description amcl.launch
+
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+
+
+# salvando o mapa 
+
+rosrun map_server map_saver -f <map_name>

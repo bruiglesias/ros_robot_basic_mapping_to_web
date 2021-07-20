@@ -70,7 +70,6 @@
       });
 
       function displayPoseMarker() {
-        // Create a marker representing the robot.
         var robotMarker = new ROS2D.NavigationArrow({
           size : 12,
           strokeSize : 1,
@@ -78,11 +77,11 @@
         });
         robotMarker.visible = false;
 
-        // Add the marker to the 2D scene.
+  
         gridClient.rootObject.addChild(robotMarker);
         var initScaleSet = false;
 
-        // Subscribe to the robot's pose updates.
+
         var poseListener = new ROSLIB.Topic({
           ros : ros,
           name : '/odom',
@@ -90,7 +89,6 @@
         });
       
         poseListener.subscribe(function(pose) {
-          // Orientate the marker based on the robot's pose.
           robotMarker.x = pose.pose.pose.position.x;
           robotMarker.y = -pose.pose.pose.position.y;
           if (!initScaleSet) {
@@ -201,12 +199,17 @@
       <div class="row">
         <div id="twod-map"></div>
         <div style="display: flex; justify-content: center; align-items: center; width: 550px">
+          <div>
+            <button class="btn btn-light p-5 mt-5 ml-5 border">Salvar Ponto</button>
+            <button class="btn btn-light p-5 mt-5 ml-5 border">Salvar Mapa</button>
+          </div>
           <div style="text-align:center;width:480px;">
             <button class="btn btn-light p-5 border" onmousedown="moveup()" onmouseup="clearmove()" ontouchstart="moveup()" touchcancel="clearmove()">UP</button><br><br>
             <button class="btn btn-light p-5 mr-4 border" onmousedown="moveleft()" onmouseup="clearmove()" ontouchstart="moveleft()" touchcancel="clearmove()">LEFT</button>
             <button class="btn btn-light p-5 ml-4 border" onmousedown="moveright()" onmouseup="clearmove()" ontouchstart="moveright()" touchcancel="clearmove()">RIGHT</button><br><br>
             <button class="btn btn-light p-5 border" onmousedown="movedown()" onmouseup="clearmove()" ontouchstart="movedown()" touchcancel="clearmove()">DOWN</button>
           </div>
+          
         </div>
       </div>
     </div>
